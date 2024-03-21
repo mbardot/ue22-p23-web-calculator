@@ -22,7 +22,6 @@ window.addEventListener('click', e => {
         // Handle special actions like 'clear', 'operator' or 'calculate'
         handleAction(action);
         console.log('other key!')
-        console.log(display.textContent)
         
       } else {
         // Handle numeric buttons
@@ -68,7 +67,7 @@ window.addEventListener('click', e => {
     // Update the display with the pressed button's text
     //display.textContent += text;
     if ( display.textContent === '0') {
-      // Remove the zero on the left; other 'eval' interprets it like bas-8 numbers
+      // Remove the zero on the left; other 'eval' interprets it like base-8 numbers
       display.textContent = text;
     } else {
       // Add numbers on the right
@@ -76,16 +75,50 @@ window.addEventListener('click', e => {
     }
   }
 
-  function performCalculation() {
+  async function performCalculation() {
     //when '=' is clicked we want to calculate the result and print it
     const expression = display.textContent
-    console.log(display.textContent)
-    const result = eval(expression)
-    clearDisplay()
-    updateDisplay(result)
+    
+    if ( IsValid(expression)) {
+      const result = eval(expression)
+      clearDisplay()
+      updateDisplay(result)
+
+      if (result == 'Infinity') {
+      await sleep(2000)
+      clearDisplay()
+      updateDisplay('0')
+
+      }
+    }
+    else {
+      clearDisplay()
+      updateDisplay('syntax error')
+      await sleep(2000)
+      clearDisplay()
+      updateDisplay('0')
+
+    }
     
   }
 
   function clearDisplay() {
     display.textContent = '0'
+  }
+
+  function sleep(ms) {
+    // I add this part to deal with unvalid syntax, while an invalid input still does not stop the usage of the tool
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function IsValid(text) {
+    if (text.endsWith('+') || text.endsWith('-') || text.endsWith('/') || text.endsWith('*')) {
+      return false
+    }
+    
+    else if (text.startsWith('+') || text.startsWith('-') || text.startsWith('*') || text.startsWith('/')){
+      return False
+    }
+    return true
+    
   }
